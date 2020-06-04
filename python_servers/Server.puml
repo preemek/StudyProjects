@@ -1,0 +1,57 @@
+@startuml
+hide empty members
+
+class Exception{
+}
+
+class ServerError{
+}
+
+class TooManyProductsFoundError{
+}
+
+abstract class Server{
++ __init__(self, *args, **kwargs)
++ {abstract} get_entries(self, n_letters)
++ {abstract} add (product: Product)
++ {abstract} remove_product (name: str)
+- {abstract} _n_max_returned_entries
+- {abstract} _catalog
+}
+
+class MapServer{
++ __init__(self, dct, *args, **kwargs)
++ get_entries (self, n_letters) \n throws TooManyProductsFoundError
++ add(product: Product)
++ remove_product (name: str)
+- _n_max_returned_entries
+- _catalog: Dict [Product.id : Product]
+}
+class ListServer{
++ __init__(self, lst, *args, **kwargs)
++ get_entries(self, n_letters) \n throws TooManyProductsFoundError
++ add(product: Product)
++ remove_position(index: int)
++ remove_product (name: str)
+- _n_max_returned_entries
+- _catalog: List[Product]
+}
+class Product{
++ __init__ (self, _name: str, _price: float)
+- _name: str ^[A-za-z]+[0-9]+$
+- _price: float
+}
+class Client{
++__init__ (self, server: Server)
++ {classmethod} get_total_price(cls, n_letters: Optional[int]) -> \nOptional[float]
+}
+Server <|.. MapServer
+Server <|.. ListServer
+
+MapServer  o--down-  Product
+ListServer o--down- Product
+
+Exception <|-- ServerError
+ServerError <|-- TooManyProductsFoundError
+Client -left...> Server
+@enduml
